@@ -1,7 +1,9 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
-import {ApiBearerAuth, ApiSecurity, ApiTags} from "@nestjs/swagger";
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AddUserDto } from './dto/add-user.dto';
 
@@ -25,11 +27,15 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @Patch(':id')
   update(@Param('id') id: string, @Body() user: UpdateUserDto) {
     return this.usersService.update(id, user);
   }
 
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);

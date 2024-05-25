@@ -10,26 +10,38 @@ import { Image } from './images/entities/image.entity';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { BullModule } from '@nestjs/bull';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    BullModule.forRoot({
-      redis: {
-        port: 6379,
-        host: 'redis',
-        password: '29kurlwg'
-      },
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),    
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        redis: {
+          port: configService.get<number>('REDIS_PORT'),
+          host: configService.get<string>('REDIS_HOST'),
+          password: configService.get<string>('REDIS_PASSWORD')
+        },
+      }),
+      inject: [ConfigService]
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'db',
-      port: 5432,
-      username: 'postgres',
-      password: '29kurlwg',
-      database: 'neiro',
-      entities: [User, Image],
-      synchronize: true,
-      autoLoadEntities: true,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get<string>('DB_HOST'),
+        port: configService.get<number>('DB_PORT'),
+        username: configService.get<string>('DB_USERNAME'),
+        password: configService.get<string>('DB_PASSWORD'),
+        database: configService.get<string>('DB_DATABASE'),
+        entities: [User, Image],
+        synchronize: true,
+        autoLoadEntities: true,
+      }),
+      inject: [ConfigService]
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '/public'),
