@@ -38,8 +38,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
         entities: [User, Image],
-        synchronize: true,
-        autoLoadEntities: true,
+        migrations: ['/migrations/*{.ts,.js}'],
+        migrationsTableName: '_migrations',
+        migrationsRun: true,
+        synchronize: false,
       }),
       inject: [ConfigService]
     }),
