@@ -32,7 +32,9 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
-    return await this.usersRepository.update(id, updateUserDto);
+    let user = await this.usersRepository.findOne({ where: { id: id } });
+    user.username = updateUserDto.username;
+    return await this.usersRepository.update(id, user);
   }
 
   async remove(id: string): Promise<void> {

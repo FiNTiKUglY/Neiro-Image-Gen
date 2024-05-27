@@ -19,7 +19,7 @@ import { join } from 'path';
     }),
     ScheduleModule.forRoot(),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', '/public'),
+      rootPath: join(__dirname, '..', '..', '..', '/public'),
     }),
   ],
   controllers: [ImagesController],

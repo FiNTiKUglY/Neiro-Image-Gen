@@ -26,7 +26,9 @@ export class ImagesService {
 
   @Interval(30000)
   async generate() {
-    this.imageQueue.add('get-image', { imageId: randomUUID() });
+    let image = {id: randomUUID(), name: "random" };
+    await this.imagesRepository.save(image);
+    this.imageQueue.add('get-image', { imageId: image.id }, { delay: 30000 });
   }
 
   async create(addImageDto: AddImageDto) {

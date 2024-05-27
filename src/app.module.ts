@@ -46,7 +46,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       inject: [ConfigService]
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '/public'),
+      rootPath: join(__dirname, '..', '..', '/public'),
     }),
     AuthModule, UsersModule, ImagesModule],
   controllers: [AppController],

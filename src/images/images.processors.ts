@@ -1,4 +1,4 @@
-import { OnQueueCompleted, Process, Processor } from '@nestjs/bull';
+import { OnQueueCompleted, OnQueueDrained, OnQueueError, Process, Processor } from '@nestjs/bull';
 import { Job } from 'bull';
 import axios from 'axios';
 import { join } from 'path';
@@ -10,6 +10,7 @@ import { Image } from './entities/image.entity';
 
 @Processor('generate-image')
 export class ImageProcessor {
+  private readonly logger = new Logger(ImageProcessor.name);
   constructor(
     @InjectRepository(Image)
     private imagesRepository: Repository<Image>,
@@ -25,13 +26,18 @@ export class ImageProcessor {
           }, 
           responseType: 'arraybuffer',
     });
-    const folderName = join(__dirname, "..", "..", "public");
+    const folderName = join(__dirname, "..", "..", "..", "public");
     Buffer.from(res.data, 'binary').toString('base64');
     await writeFileSync(join(folderName, `${job.data.imageId}.jpg`), res.data, 'base64');
   }
 
   @OnQueueCompleted()
   onCompleted(job: Job) {
-    this.imagesRepository.save({id: job.data.imageId, name: "random"})
+    this.imagesRepository.update(job.data.imageId, {status: "done"})
+  }
+
+  @OnQueueError()
+  onError(job: Job) {
+    this.imagesRepository.update(job.data.imageId, {status: "error"})
   }
 }

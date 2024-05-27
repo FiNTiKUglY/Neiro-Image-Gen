@@ -9,6 +9,9 @@ export class Image extends BaseEntity {
   @Column()
   name: string;
 
+  @Column({default : "generating"})
+  status: string;
+
   @ManyToMany((type) => User, (user) => user.likedImages, {cascade: true})
   @JoinTable({
     name: 'liked_images',
